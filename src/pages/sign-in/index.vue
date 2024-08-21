@@ -3,7 +3,7 @@
     <v-sheet class="w-33 d-flex align-center flex-column" rounded>
       <h2 class="mb-4">Masuk</h2>
 
-      <v-form ref="form" validate-on="submit lazy" @submit.prevent="submit" class="w-100">
+      <v-form validate-on="submit lazy" @submit.prevent="submit" class="w-100" @keyup.enter="submit">
         <v-text-field v-model="email" :rules="emailRules" label="Alamat Email" required></v-text-field>
         <v-text-field v-model="password" :rules="passwordRules" label="Password" type="password"
           required></v-text-field>
@@ -11,6 +11,10 @@
         <v-btn :loading="loading" class="mt-2 bg-indigo" text="Submit" type="submit" block elevated
           :disabled="disabled"></v-btn>
       </v-form>
+
+      <small class="text-grey-darken-1 mt-8">
+        © Wejaya Food {{ new Date().getFullYear() }}
+      </small>
     </v-sheet>
   </div>
 </template>
@@ -28,13 +32,17 @@ const session = useSessionStore()
 const loading = ref(false)
 const password = ref('')
 const email = ref('')
+const isValidEmail = ref(false)
+const isValidPassword = ref(false);
 
 // Validation rules
 const passwordRules = [
   value => {
     if (value?.length > 6) {
+      isValidEmail.value = true
       return true
     }
+    isValidEmail.value = false
     return 'Password minimal 6 karakter.'
   }
 ]
@@ -42,8 +50,10 @@ const passwordRules = [
 const emailRules = [
   value => {
     if (/.+@.+\..+/.test(value)) {
+      isValidPassword.value = true
       return true
     }
+    isValidPassword.value = false
     return 'Format email tidak sesuai.'
   }
 ]
@@ -58,11 +68,18 @@ const router = useRouter()
 async function submit() {
   try {
     loading.value = true
-    // Assuming the form is already validated through some means
 
+    // Validate the form before proceeding
+
+    const isValidForm = isValidEmail.value && isValidPassword.value
+
+    if (!isValidForm) {
+      loading.value = false
+      return
+    }
     const { data } = await api.post("/user/sign-in", { email: email.value, password: password.value })
     session.setSession(data)
-    SwalSuccess("Login successfully, welcome to BonusAnalyzer")
+    SwalSuccess(`Berhasil masuk, selamat bekerja kembali ${data?.name}`)
     router.push('/')
   } catch (err) {
     const msg = err?.response?.data?.error || "Unknown error occurred."
