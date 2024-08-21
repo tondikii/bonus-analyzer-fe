@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex justify-center align-center h-screen w-screen">
     <v-sheet class="w-33 d-flex align-center flex-column" rounded>
-      <h2 class="mb-4">Sign In</h2>
+      <h2 class="mb-4">Masuk</h2>
 
       <v-form ref="form" validate-on="submit lazy" @submit.prevent="submit" class="w-100">
         <v-text-field v-model="email" :rules="emailRules" label="Alamat Email" required></v-text-field>
@@ -15,75 +15,60 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { api } from '@/lib/axios'
 import { SwalError, SwalSuccess } from '@/lib/sweetalert2'
+import { useSessionStore } from '@/stores/app'
 
-export default {
-  data: vm => ({
-    loading: false,
-    passwordRules: [value => {
-      if (value?.length > 6) {
-        return true
-      }
-      return 'Password minimal 6 karakter.'
-    }],
-    timeout: null,
-    password: '',
-    email: '',
-    emailRules: [
-      value => {
-        if (/.+@.+\..+/.test(value)) { return true }
+const session = useSessionStore()
 
-        return 'Format email tidak sesuai.'
-      },
-    ],
-  }),
+// State
+const loading = ref(false)
+const password = ref('')
+const email = ref('')
 
-  computed: {
-    disabled() {
-      return !this.email || !this.password;
+// Validation rules
+const passwordRules = [
+  value => {
+    if (value?.length > 6) {
+      return true
     }
-  },
+    return 'Password minimal 6 karakter.'
+  }
+]
 
-  methods: {
-    async submit(event) {
-      try {
-        this.loading = true
-        // Validate the form inputs
-        const { valid } = await this.$refs.form.validate() || {}
-        if (!valid) {
-          return
-        }
+const emailRules = [
+  value => {
+    if (/.+@.+\..+/.test(value)) {
+      return true
+    }
+    return 'Format email tidak sesuai.'
+  }
+]
 
-        const { data } = await api.post("/user/sign-in", { email: this.email, password: this.password })
-        localStorage.setItem("session", JSON.stringify(data))
-        SwalSuccess("Login successfully, welcome to BonusAnalyzer")
-        this.$router.push('/')
-      } catch (err) {
-        const msg = err?.response?.data?.error || "Unknown error occured."
-        SwalError(msg)
-      } finally {
-        this.loading = false
-      }
+// Computed property for form disable state
+const disabled = computed(() => !email.value || !password.value)
 
+// Router
+const router = useRouter()
 
+// Methods
+async function submit() {
+  try {
+    loading.value = true
+    // Assuming the form is already validated through some means
 
-      // alert(JSON.stringify(results, null, 2))
-
-    },
-    // async checkApi(userName) {
-    //   return new Promise(resolve => {
-    //     clearTimeout(this.timeout)
-
-    //     this.timeout = setTimeout(() => {
-    //       if (!userName) return resolve('Please enter a user name.')
-    //       if (userName === 'johnleider') return resolve('User name already taken. Please try another one.')
-
-    //       return resolve(true)
-    //     }, 1000)
-    //   })
-    // },
-  },
+    const { data } = await api.post("/user/sign-in", { email: email.value, password: password.value })
+    session.setSession(data)
+    SwalSuccess("Login successfully, welcome to BonusAnalyzer")
+    router.push('/')
+  } catch (err) {
+    const msg = err?.response?.data?.error || "Unknown error occurred."
+    SwalError(msg)
+  } finally {
+    loading.value = false
+  }
 }
 </script>

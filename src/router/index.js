@@ -34,8 +34,7 @@ router.isReady().then(() => {
 })
 
 router.beforeEach((to, from, next) => {
-  const session = JSON.parse(localStorage.getItem("session"))
-  const isAuthenticated = session?.access_token
+  const isAuthenticated = localStorage.getItem("token")
   const signInRouteName = '/sign-in/'
   const homeRouteName = "/"
   

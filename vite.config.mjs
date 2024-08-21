@@ -6,7 +6,6 @@ import Layouts from "vite-plugin-vue-layouts";
 import Vue from "@vitejs/plugin-vue";
 import VueRouter from "unplugin-vue-router/vite";
 import Vuetify, {transformAssetUrls} from "vite-plugin-vuetify";
-// import Lib from "vite-plugin-vue-lib";
 
 // Utilities
 import {defineConfig} from "vite";
@@ -17,7 +16,6 @@ export default defineConfig({
   plugins: [
     VueRouter(),
     Layouts(),
-    // Lib(),
     Vue({
       template: {transformAssetUrls},
     }),
