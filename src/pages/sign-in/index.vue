@@ -18,7 +18,6 @@
 <script>
 import { api } from '@/lib/axios'
 import { SwalError, SwalSuccess } from '@/lib/sweetalert2'
-import Swal from 'sweetalert2'
 
 export default {
   data: vm => ({

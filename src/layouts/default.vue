@@ -1,13 +1,14 @@
 <template>
   <v-app>
-    <v-main>
+    <v-main class="d-flex flex-row">
+      <Sidebar />
       <router-view />
     </v-main>
 
-    <AppFooter />
+    <!-- <AppFooter /> -->
   </v-app>
 </template>
 
 <script setup>
-  //
+//
 </script>
