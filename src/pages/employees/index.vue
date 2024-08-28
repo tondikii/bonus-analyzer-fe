@@ -1,7 +1,23 @@
 <template>
-  <h1>Halaman karyawan</h1>
+  <div class="d-flex flex-column w-100 align-center">
+    <v-sheet class="d-flex flex-column w-75 mt-16 pa-4" border rounded>
+      <v-row align="center" justify="space-between" class="my-1 px-4">
+        <h3 class="">Data Karyawan</h3>
+        <v-btn density="compact" icon="mdi-plus" @click="handleCreate"></v-btn>
+      </v-row>
+      <v-divider class="my-4"></v-divider>
+      <Table :headers="headers" endpoint="/employee" search-label="Cari nama karyawan" />
+    </v-sheet>
+  </div>
 </template>
 
 <script setup>
-//
+
+const headers = [
+  { title: 'Nama', align: 'start', sortable: false, key: 'name' },
+  { title: 'Id Karyawan', align: 'start', key: 'identityNumber' },
+]
+
+const handleCreate = () => {
+}
 </script>
