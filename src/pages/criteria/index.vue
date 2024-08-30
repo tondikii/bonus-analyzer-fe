@@ -2,7 +2,7 @@
   <div class="d-flex flex-column w-100 align-center">
     <v-sheet class="d-flex flex-column w-75 mt-16 pa-4" border rounded>
       <v-row align="center" justify="space-between" class="mb-4 mt-1 px-4">
-        <h3 class="">Data Kriteria</h3>
+        <h2 class="">Data Kriteria</h2>
         <v-btn density="compact" icon="mdi-plus" @click="handleCreate"></v-btn>
       </v-row>
       <v-divider></v-divider>
