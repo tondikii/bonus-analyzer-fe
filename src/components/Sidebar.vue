@@ -49,7 +49,7 @@ const rail = ref(true)
 const menus = ref([
   { name: "home", title: "Home", route: "/", icon: "mdi-home-city" },
   { name: "employee", title: "karyawan", route: "/employee", icon: "mdi-account-group-outline" },
-  { name: "criterion", title: "Kriteria", route: "/criteria", icon: "mdi-text-box-search-outline" }
+  { name: "criteria", title: "Kriteria", route: "/criteria", icon: "mdi-text-box-search-outline" }
 ])
 
 // Accessing the current route and router
