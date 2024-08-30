@@ -49,8 +49,7 @@ export default {
         this.items = data.rows.map((e, idx) => ({ no: idx + 1, ...e }));
         this.totalItems = data.count;
       } catch (err) {
-        console.log(err);
-        SwalError("Unknown error occurred.");
+        SwalError("Terjadi kesalahan tidak diketahui saat memuat data");
       } finally {
         this.loading = false;
       }

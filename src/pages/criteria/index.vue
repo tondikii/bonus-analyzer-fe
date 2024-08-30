@@ -22,7 +22,7 @@ const headers = [
 ]
 
 const handleCreate = () => {
-  router.push('/criterion/create')
+  router.push('/criteria/create')
 }
 
 //

@@ -82,7 +82,7 @@ async function submit() {
     SwalSuccess(`Berhasil masuk, selamat bekerja kembali ${data?.name}`)
     router.push('/')
   } catch (err) {
-    const msg = err?.response?.data?.error || "Unknown error occurred."
+    const msg = err?.response?.data?.error || "Terjadi kesalahan tidak diketahui pada saat masuk"
     SwalError(msg)
   } finally {
     loading.value = false
