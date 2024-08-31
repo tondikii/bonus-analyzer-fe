@@ -47,7 +47,7 @@ import { ref, computed } from 'vue';
 import CriteriaForm from '@/components/CriteriaForm.vue';
 import { useRouter } from 'vue-router';
 import { api } from '@/lib/axios';
-import { SwalSuccess } from '@/lib/sweetalert2';
+import { SwalError, SwalSuccess } from '@/lib/sweetalert2';
 
 const router = useRouter()
 const name = ref('');
@@ -90,7 +90,7 @@ const submitForm = async () => {
     SwalSuccess(`Berhasil buat kriteria ${name.value}`)
     router.replace('/criteria')
   } catch (err) {
-    const msg = err?.response?.data?.error || "Unknown error occurred."
+    const msg = err?.response?.data?.error || "Terjadi error tidak diketahui saat membuat kriteria."
     SwalError(msg)
   } finally {
     loading.value = false;

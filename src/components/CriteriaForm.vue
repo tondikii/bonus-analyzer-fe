@@ -17,13 +17,23 @@ import { ref, watch } from 'vue';
 const props = defineProps({
   name: { type: String, default: '' },
   weight: { type: [String, Number], default: '' }
-})
+});
 
 const emit = defineEmits(['update:name', 'update:weight']);
 
 const nameRef = ref(props.name);
 const weightRef = ref(props.weight);
 
+// Watch props for changes and update refs accordingly
+watch(() => props.name, (newName) => {
+  nameRef.value = newName;
+});
+
+watch(() => props.weight, (newWeight) => {
+  weightRef.value = newWeight;
+});
+
+// Emit changes to parent component
 watch(nameRef, (newName) => emit('update:name', newName));
 watch(weightRef, (newWeight) => emit('update:weight', newWeight));
 

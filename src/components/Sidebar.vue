@@ -38,6 +38,7 @@ import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
 import { useSessionStore } from '@/stores/app'
+import { SwalConfirm } from '@/lib/sweetalert2';
 
 const session = useSessionStore()
 
@@ -76,21 +77,11 @@ function onClickMenu(route) {
 }
 
 // Method to handle sign out
-function onClickSignOut() {
-  Swal.fire({
-    title: "Keluar",
-    text: "Apakah kamu yakin ingin keluar?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Keluar",
-    cancelButtonText: "Batal",
-  }).then((result) => {
-    if (result.isConfirmed) {
-      session.clearSession()
-      router.push('/sign-in')
-    }
-  })
+async function onClickSignOut() {
+  const { isConfirmed } = await SwalConfirm({ title: "Keluar", text: "Apakah kamu yakin ingin keluar?" })
+  if (isConfirmed) {
+    session.clearSession()
+    router.push('/sign-in')
+  }
 }
 </script>

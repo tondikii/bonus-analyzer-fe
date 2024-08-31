@@ -1,4 +1,5 @@
 import Swal from "sweetalert2";
+import styles from "./styles.module.css";
 
 export const SwalError = (msg) => {
   Swal.fire({
@@ -13,5 +14,39 @@ export const SwalSuccess = (msg) => {
     icon: "success",
     title: "Success",
     text: msg,
+  });
+};
+
+export const SwalConfirm = ({ title = "Konfirmasi", text }) =>
+  Swal.fire({
+    title,
+    text,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Ya",
+    cancelButtonText: "Batal",
+    customClass: {
+      confirmButton: styles.swalButton,
+      cancelButton: styles.swalButton,
+    },
+  });
+
+export const SwalToast = ({ icon = "success", title = "" }) => {
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+  Toast.fire({
+    icon,
+    title,
   });
 };

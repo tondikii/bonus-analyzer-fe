@@ -1,15 +1,26 @@
 <template>
-  <v-data-table-server v-model:items-per-page="itemsPerPage"
-    :headers="[{ title: 'No', align: 'center', sortable: false, key: 'no' }, ...headers]" :items="items"
-    :items-length="totalItems" :loading="loading" item-value="name" @update:options="loadItems">
+  <v-data-table-server :items-per-page="itemsPerPage" :headers="tableHeaders" :items="items" :items-length="totalItems"
+    :loading="loading" item-value="name" @update:options="loadItems">
     <template v-slot:top>
-      <v-text-field v-show="Boolean(searchLabel)" v-model="search" class="" :label="searchLabel"></v-text-field>
+      <v-text-field v-show="Boolean(searchLabel)" v-model="search" :label="searchLabel" @input="onSearch"
+        clearable></v-text-field>
+    </template>
+
+    <template v-slot:[`item.actions`]="{ item }">
+      <v-btn icon @click="onEdit(item)" color="warning">
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+      <v-btn icon color="red" @click="deleteItem(item)" class="ml-2">
+        <v-icon>mdi-delete</v-icon>
+      </v-btn>
     </template>
   </v-data-table-server>
 </template>
 
 <script>
+import { debounce } from 'lodash';
 import { api } from '@/lib/axios';
+import { SwalConfirm, SwalSuccess, SwalError } from '@/lib/sweetalert2';
 
 export default {
   name: "Table",
@@ -26,6 +37,18 @@ export default {
       type: String,
       default: '',
     },
+    onEdit: {
+      type: Function,
+      default: () => { }
+    },
+    dataMapper: {
+      type: [Function, null],
+      default: null
+    },
+    refreshKey: {
+      type: String,
+      default: ''
+    }
   },
   data() {
     return {
@@ -34,24 +57,64 @@ export default {
       loading: true,
       totalItems: 0,
       itemsPerPage: 5,
+      currentPage: 1,
     };
   },
+  watch: {
+    refreshKey() {
+      this.loadItems({ page: this.currentPage, itemsPerPage: this.itemsPerPage });
+    },
+  },
+  computed: {
+    tableHeaders() {
+      return [
+        { title: 'No', align: 'center', sortable: false, key: 'no' },
+        ...this.headers,
+        { title: 'Actions', align: 'center', sortable: false, key: 'actions' },
+      ];
+    },
+  },
+  created() {
+    // Debounce the search function to avoid excessive API calls
+    this.debouncedLoadItems = debounce(this.loadItems, 500);
+  },
   methods: {
-    async loadItems({ page, itemsPerPage, sortBy }) {
+    onSearch() {
+      // Trigger the debounced search function
+      this.debouncedLoadItems({ page: 1, itemsPerPage: this.itemsPerPage });
+    },
+    async loadItems({ page = 1, itemsPerPage = 5 }) {
       try {
         this.loading = true;
+        this.currentPage = page;
+        this.itemsPerPage = itemsPerPage;
         const params = {
           page,
           limit: itemsPerPage,
           search: this.search,
         };
         const { data } = await api.get(this.endpoint, { params });
-        this.items = data.rows.map((e, idx) => ({ no: idx + 1, ...e }));
-        this.totalItems = data.count;
+
+        let rows = data?.rows || [];
+        const startNo = (page - 1) * itemsPerPage + 1;
+
+        if (this.dataMapper) {
+          rows = this.dataMapper(rows);
+        }
+        this.items = rows.map((e, idx) => ({ no: startNo + idx, ...e }));
+        this.totalItems = data.count || 0;
       } catch (err) {
         SwalError("Terjadi kesalahan tidak diketahui saat memuat data");
       } finally {
         this.loading = false;
+      }
+    },
+    async deleteItem(item) {
+      const { isConfirmed } = await SwalConfirm({ title: 'Hapus data', text: `Apakah Anda yakin ingin menghapus ${item.name}?` });
+      if (isConfirmed) {
+        await api.delete(`${this.endpoint}/${item.id}`);
+        SwalSuccess(`Berhasil menghapus ${item.name}`);
+        this.loadItems({ page: this.currentPage, itemsPerPage: this.itemsPerPage });
       }
     },
   },
