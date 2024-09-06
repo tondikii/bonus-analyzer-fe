@@ -7,8 +7,11 @@
     </template>
 
     <template v-slot:[`item.actions`]="{ item }">
-      <v-btn icon @click="onEdit(item)" color="warning">
+      <v-btn v-show="!noEdit" icon @click="onEdit(item)" color="warning">
         <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+      <v-btn v-show="downloadAble" icon @click="onDownload(item)" color="primary">
+        <v-icon>mdi-download</v-icon>
       </v-btn>
       <v-btn icon color="red" @click="deleteItem(item)" class="ml-2">
         <v-icon>mdi-delete</v-icon>
@@ -41,6 +44,10 @@ export default {
       type: Function,
       default: () => { }
     },
+    onDownload: {
+      type: Function,
+      default: () => { }
+    },
     dataMapper: {
       type: [Function, null],
       default: null
@@ -48,7 +55,15 @@ export default {
     refreshKey: {
       type: String,
       default: ''
-    }
+    },
+    noEdit: {
+      type: Boolean,
+      default: false
+    },
+    downloadAble: {
+      type: Boolean,
+      default: false
+    },
   },
   data() {
     return {
@@ -56,7 +71,7 @@ export default {
       items: [],
       loading: true,
       totalItems: 0,
-      itemsPerPage: 5,
+      itemsPerPage: 10,
       currentPage: 1,
     };
   },
@@ -83,7 +98,7 @@ export default {
       // Trigger the debounced search function
       this.debouncedLoadItems({ page: 1, itemsPerPage: this.itemsPerPage });
     },
-    async loadItems({ page = 1, itemsPerPage = 5 }) {
+    async loadItems({ page = 1, itemsPerPage = 10 }) {
       try {
         this.loading = true;
         this.currentPage = page;
@@ -110,10 +125,10 @@ export default {
       }
     },
     async deleteItem(item) {
-      const { isConfirmed } = await SwalConfirm({ title: 'Hapus data', text: `Apakah Anda yakin ingin menghapus ${item.name}?` });
+      const { isConfirmed } = await SwalConfirm({ title: 'Hapus data', text: `Apakah Anda yakin ingin menghapus ${item.name || 'data'}?` });
       if (isConfirmed) {
         await api.delete(`${this.endpoint}/${item.id}`);
-        SwalSuccess(`Berhasil menghapus ${item.name}`);
+        SwalSuccess(`Berhasil menghapus ${item.name || 'data'}`);
         this.loadItems({ page: this.currentPage, itemsPerPage: this.itemsPerPage });
       }
     },

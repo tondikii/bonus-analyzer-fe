@@ -17,8 +17,6 @@
           <v-list-item v-for="({ icon, name, title, route }, idx) in menus" :key="idx"
             :class="location?.path === route ? 'bg-secondary-custom' : ''" :prepend-icon="icon" :title="title"
             :value="name" @click="onClickMenu(route)"></v-list-item>
-          <!-- <v-list-item prepend-icon="mdi-account" title="My Account" value="account"></v-list-item>
-          <v-list-item prepend-icon="mdi-account-group-outline" title="Users" value="users"></v-list-item> -->
         </v-list>
 
         <v-divider></v-divider>
@@ -36,7 +34,6 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Swal from 'sweetalert2'
 import { useSessionStore } from '@/stores/app'
 import { SwalConfirm } from '@/lib/sweetalert2';
 
@@ -50,7 +47,8 @@ const rail = ref(true)
 const menus = ref([
   { name: "home", title: "Home", route: "/", icon: "mdi-home-city" },
   { name: "employee", title: "karyawan", route: "/employee", icon: "mdi-account-group-outline" },
-  { name: "criteria", title: "Kriteria", route: "/criteria", icon: "mdi-text-box-search-outline" }
+  { name: "criteria", title: "Kriteria", route: "/criteria", icon: "mdi-text-box-search-outline" },
+  { name: "performance", title: "Peringkat Karyawan", route: "/performance", icon: "mdi-human-male-board-poll" }
 ])
 
 // Accessing the current route and router

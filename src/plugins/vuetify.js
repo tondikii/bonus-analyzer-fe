@@ -17,6 +17,9 @@ export default createVuetify({
   components: {
     VNumberInput,
   },
+  locale: {
+    locale: "id",
+  },
   // theme: {
   //   // defaultTheme: 'dark',
   // },

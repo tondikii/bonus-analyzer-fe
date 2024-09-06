@@ -5,7 +5,8 @@
 
       <v-form validate-on="submit lazy" @submit.prevent="submit" class="w-100" @keyup.enter="submit">
         <v-text-field v-model="email" :rules="emailRules" label="Alamat Email" required></v-text-field>
-        <v-text-field v-model="password" :rules="passwordRules" label="Password" type="password"
+        <v-text-field v-model="password" :rules="passwordRules" label="Password" :type="visible ? 'text' : 'password'"
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" @click:append-inner="visible = !visible"
           required></v-text-field>
 
         <v-btn :loading="loading" class="mt-2 bg-indigo" text="Submit" type="submit" block elevated
@@ -34,6 +35,7 @@ const password = ref('')
 const email = ref('')
 const isValidEmail = ref(false)
 const isValidPassword = ref(false);
+const visible = ref(false)
 
 // Validation rules
 const passwordRules = [
