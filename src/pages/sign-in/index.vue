@@ -3,7 +3,7 @@
     <v-sheet class="w-33 d-flex align-center flex-column" rounded>
       <h2 class="mb-4">Masuk</h2>
 
-      <v-form validate-on="submit lazy" @submit.prevent="submit" class="w-100" @keyup.enter="submit">
+      <v-form validate-on="submit lazy" @submit.prevent="submit" class="w-100">
         <v-text-field v-model="email" :rules="emailRules" label="Alamat Email" required></v-text-field>
         <v-text-field v-model="password" :rules="passwordRules" label="Password" :type="visible ? 'text' : 'password'"
           :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'" @click:append-inner="visible = !visible"
@@ -26,6 +26,7 @@ import { useRouter } from 'vue-router'
 import { api } from '@/lib/axios'
 import { SwalError, SwalSuccess } from '@/lib/sweetalert2'
 import { useSessionStore } from '@/stores/app'
+import { validateEmail, validatePassword } from '@/utils'
 
 const session = useSessionStore()
 
@@ -33,29 +34,23 @@ const session = useSessionStore()
 const loading = ref(false)
 const password = ref('')
 const email = ref('')
-const isValidEmail = ref(false)
-const isValidPassword = ref(false);
 const visible = ref(false)
 
 // Validation rules
 const passwordRules = [
   value => {
-    if (value?.length > 6) {
-      isValidEmail.value = true
+    if (validatePassword(value)) {
       return true
     }
-    isValidEmail.value = false
     return 'Password minimal 6 karakter.'
   }
 ]
 
 const emailRules = [
   value => {
-    if (/.+@.+\..+/.test(value)) {
-      isValidPassword.value = true
+    if (validateEmail(value)) {
       return true
     }
-    isValidPassword.value = false
     return 'Format email tidak sesuai.'
   }
 ]
@@ -69,16 +64,14 @@ const router = useRouter()
 // Methods
 async function submit() {
   try {
-    loading.value = true
-
     // Validate the form before proceeding
-
-    const isValidForm = isValidEmail.value && isValidPassword.value
+    const isValidForm = validateEmail(email.value) || validatePassword(password.value)
 
     if (!isValidForm) {
-      loading.value = false
       return
     }
+
+    loading.value = true
     const { data } = await api.post("/user/sign-in", { email: email.value, password: password.value })
     session.setSession(data)
     SwalSuccess(`Berhasil masuk, selamat bekerja kembali ${data?.name}`)

@@ -1,11 +1,14 @@
 import Swal from "sweetalert2";
-import styles from "./styles.module.css";
+import styles from "./styles.module.scss";
 
 export const SwalError = (msg) => {
   Swal.fire({
     icon: "error",
     title: "Oops...",
     text: msg,
+    customClass: {
+      confirmButton: styles.swalButton,
+    },
   });
 };
 
@@ -14,6 +17,9 @@ export const SwalSuccess = (msg) => {
     icon: "success",
     title: "Success",
     text: msg,
+    customClass: {
+      confirmButton: styles.swalButton,
+    },
   });
 };
 

@@ -82,16 +82,16 @@ const disabledSubmit = computed(() => {
 
 const fetchMaster = async (endpoint = '/employee') => {
   try {
-    const { data } = await api.get(endpoint, { params: { limit: -1 } });
+    const { data } = await api.get(`${endpoint}/only`, { params: { limit: -1 } });
     const isFetchEmployee = endpoint === '/employee';
     if (isFetchEmployee) {
-      employees.value = data?.rows;
+      employees.value = data;
       // Initialize selectedScores based on employees
       employees.value.forEach(employee => {
         selectedScores.value[employee.id] = {};
       });
     } else {
-      criterion.value = data?.rows?.map(e => {
+      criterion.value = data?.map(e => {
         return { ...e };
       });
     }
@@ -138,7 +138,7 @@ const submitForm = async () => {
     SwalSuccess(`Berhasil buat Laporan Peringkat Karyawan Periode ${month.value}`);
     router.replace('/performance');
   } catch (err) {
-    const msg = err?.response?.data?.error || "Terjadi error tidak diketahui saat membuat laporan performa.";
+    const msg = err?.response?.data?.error || "Terjadi error tidak diketahui saat membuat laporan peringkat.";
     SwalError(msg);
   } finally {
     loading.value = false;

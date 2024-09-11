@@ -7,13 +7,16 @@
     </template>
 
     <template v-slot:[`item.actions`]="{ item }">
-      <v-btn v-show="!noEdit" icon @click="onEdit(item)" color="warning">
+      <v-btn v-show="!noEdit" icon @click="onEdit(item)" class="mx-1" color="warning">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
-      <v-btn v-show="downloadAble" icon @click="onDownload(item)" color="primary">
+      <v-btn v-show="downloadAble" icon @click="onDownload(item)" class="mx-1" color="primary">
         <v-icon>mdi-download</v-icon>
       </v-btn>
-      <v-btn icon color="red" @click="deleteItem(item)" class="ml-2">
+      <v-btn v-show="printAble" icon @click="onPrint(item)" class="mx-1" color="primary">
+        <v-icon>mdi-printer</v-icon>
+      </v-btn>
+      <v-btn icon class="mx-1" color="red" @click="deleteItem(item)">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </template>
@@ -48,6 +51,10 @@ export default {
       type: Function,
       default: () => { }
     },
+    onPrint: {
+      type: Function,
+      default: () => { }
+    },
     dataMapper: {
       type: [Function, null],
       default: null
@@ -64,6 +71,12 @@ export default {
       type: Boolean,
       default: false
     },
+    printAble: {
+      type: Boolean,
+      default: false
+    },
+    endpointParams: { type: Object, default: {} },
+    prevent: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -100,6 +113,9 @@ export default {
     },
     async loadItems({ page = 1, itemsPerPage = 10 }) {
       try {
+        if (this.prevent) {
+          return
+        }
         this.loading = true;
         this.currentPage = page;
         this.itemsPerPage = itemsPerPage;
@@ -108,7 +124,7 @@ export default {
           limit: itemsPerPage,
           search: this.search,
         };
-        const { data } = await api.get(this.endpoint, { params });
+        const { data } = await api.get(this.endpoint, { params: { ...params, ...this.endpointParams } });
 
         let rows = data?.rows || [];
         const startNo = (page - 1) * itemsPerPage + 1;

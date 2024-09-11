@@ -1,0 +1,11 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  transition: width 0.3s ease;
+}
+
+.container:not([is-expanded="true"]) {
+  width: 82vw !important;
+}

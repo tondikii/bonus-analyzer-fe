@@ -2,12 +2,12 @@
   <div class="d-flex flex-column w-100 align-center">
     <v-sheet class="d-flex flex-column w-75 mt-16 pa-4" border rounded>
       <v-row align="center" justify="space-between" class="mb-4 mt-1 px-4">
-        <h2 class="">Data Laporan Peringkat Karyawan</h2>
+        <h2 class="">Data Laporan Performa Karyawan</h2>
         <v-btn icon="mdi-plus" @click="handleCreate" />
       </v-row>
       <v-divider />
       <Table :headers="headers" endpoint="/performanceReport" :downloadAble="true" :onDownload="handleDownload"
-        :dataMapper="dataMapper" :noEdit="true" />
+        :printAble="true" :onPrint="handlePrint" :dataMapper="dataMapper" :noEdit="true" />
     </v-sheet>
   </div>
 </template>
@@ -60,6 +60,67 @@ const handleDownload = async (item) => {
   } catch (err) {
     const msg = err?.response?.data?.error || `Terjadi error tidak diketahui saat mengunduh periode ${item?.period}.`;
     SwalError(msg)
+
+  }
+}
+
+const handlePrint = async (item) => {
+  try {
+    const { data } = await api.get(`/performanceReport/download/${item?.id}`, {
+      headers: { 'Content-Type': 'text/csv' },
+      responseType: 'text' // Change to 'text' instead of 'blob'
+    });
+
+    const datePeriod = new Date(item?.period);
+    const monthPeriod = datePeriod.getMonth() + 1;
+    const reportTitle = `Performance Report ${datePeriod.getUTCFullYear()}_${monthPeriod.toString().padStart(2, "0")}`;
+
+    // Convert CSV to HTML table
+    const rows = data.split('\n').map(row => row.split(','));
+    const tableHtml = `
+      <table border="1" cellpadding="5" cellspacing="0">
+        <thead>
+          <tr>${rows[0].map(header => `<th>${header}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${rows.slice(1).map(row => `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+
+    // Create a new window with the HTML content
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${reportTitle}</title>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid black; padding: 5px; text-align: left; }
+            @media print {
+              body { -webkit-print-color-adjust: exact; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>${reportTitle}</h1>
+          ${tableHtml}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+
+    // Wait for content to load before printing
+    printWindow.onload = function () {
+      printWindow.print();
+      printWindow.onafterprint = function () {
+        printWindow.close();
+      };
+    };
+  } catch (error) {
+    console.error('Error printing report:', error);
+    // Handle error (e.g., show an error message to the user)
   }
 }
 

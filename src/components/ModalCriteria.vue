@@ -5,10 +5,12 @@
 
 
     <v-form class="" @submit.prevent="submitForm">
-      <v-card prepend-icon="mdi-account" :title="`${isEdit ? 'Ubah' : 'Tambah'} Karyawan`">
+      <v-card :prepend-icon="`mdi-${icon}`" :title="`${isEdit ? 'Ubah' : 'Tambah'} ${title}`">
 
         <v-card-text>
           <v-text-field label="Nama" v-model="name" required hide-details />
+          <v-number-input v-model="weight" control-variant="default" label="Bobot" inset :min="0" :max="100"
+            hide-details required />
 
         </v-card-text>
 
@@ -33,27 +35,45 @@ import { ref, watch } from 'vue';
 
 const props = defineProps({
   dialog: { type: Boolean, default: false },
-  employee: { type: [Object, null], default: null },
-  callback: { type: Function, default: () => { } }
+  data: { type: [Object, null], default: null },
+  callback: { type: Function, default: () => { } },
+  title: { type: String, default: 'Kriteria' },
+  endpoint: {
+    type: String,
+    default: '/criteria'
+  },
+  icon: { type: String, default: 'text-box-search-outline' },
+  criteriaId: { type: [Number, undefined], default: undefined }
 });
 
 const emit = defineEmits(['update:dialog']);
 
 const dialogRef = ref(props.dialog);
 const name = ref(props.name);
+const weight = ref(props.weight);
 const loading = ref(false);
 
+const resetForm = () => {
+  name.value = '';
+  weight.value = null
+  loading.value = false
+};
+
 const disabledSubmit = computed(() => {
-  return !Boolean(name.value)
+  return Boolean(!name.value || !weight.value)
 });
-const isEdit = computed(() => { return Boolean(props.employee) })
+const isEdit = computed(() => { return Boolean(props.data) })
 
 // Watch props for changes and update refs accordingly
 watch(() => props.dialog, (newDialog) => {
   dialogRef.value = newDialog;
+  if (!newDialog) {
+    resetForm()
+  }
 });
-watch(() => props.employee, (employee) => {
-  name.value = employee?.name || '';
+watch(() => props.data, (newData) => {
+  name.value = newData?.name || '';
+  weight.value = newData?.weight || '';
 });
 
 // Emit changes to parent component
@@ -62,13 +82,14 @@ watch(dialogRef, (newDialog) => {
 });
 
 const submitForm = async () => {
-  const { employee } = props
+  const { data } = props
+
   try {
     if (disabledSubmit.value) return;
     loading.value = true;
-    await api[isEdit ? 'put' : 'post'](`/employee${isEdit ? `/${employee.id}` : ''}`, { name: name.value })
+    await api[isEdit.value ? 'put' : 'post'](`${props.endpoint}${isEdit.value ? `/${data?.id}` : ''}`, { name: name.value, weight: weight.value, criteriaId: props.criteriaId })
 
-    SwalToast({ title: `Berhasil ${isEdit ? 'edit' : 'tambah'} karyawan` })
+    SwalToast({ title: `Berhasil ${isEdit.value ? 'edit' : 'tambah'} ${props.title.toLowerCase()}` })
     props.callback()
   } catch (err) {
     const msg = err?.response?.data?.error || `Terjadi error tidak diketahui`

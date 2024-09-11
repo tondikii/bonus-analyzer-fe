@@ -19,6 +19,7 @@ export const useSessionStore = defineStore("session", {
       this.name = data.name;
       this.email = data.email;
       localStorage.setItem("name", data.name);
+      localStorage.setItem("email", data.email);
       localStorage.setItem("token", data.access_token);
     },
     clearSession() {

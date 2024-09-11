@@ -19,7 +19,7 @@ import { ref, watch } from 'vue';
 
 const headers = [
   { title: 'Nama', align: 'start', sortable: false, key: 'name' },
-  { title: 'Id Karyawan', align: 'start', key: 'identityNumber' },
+  { title: 'Id Karyawan', align: 'start', key: 'identityNumber', sortable: false },
 ]
 
 const dialog = ref(false);
