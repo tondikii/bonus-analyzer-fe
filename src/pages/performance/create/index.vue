@@ -82,8 +82,8 @@ const disabledSubmit = computed(() => {
 
 const fetchMaster = async (endpoint = '/employee') => {
   try {
-    const { data } = await api.get(`${endpoint}/only`, { params: { limit: -1 } });
     const isFetchEmployee = endpoint === '/employee';
+    const { data } = await api.get(`${endpoint}/only`, { params: {withAppraisal: !isFetchEmployee ? true : undefined} });
     if (isFetchEmployee) {
       employees.value = data;
       // Initialize selectedScores based on employees
