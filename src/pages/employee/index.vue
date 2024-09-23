@@ -18,7 +18,7 @@
 
 <script setup>
 import { useAppStore, useSessionStore } from '@/stores/app';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 
 
 const headers = [
@@ -46,17 +46,12 @@ const handleEdit = (item) => {
   dialog.value = true
 }
 
-watch(() => appStore.table, (dataTable) => {
-  console.log({ dataTable });
-});
-
 const handlePrint = () => {
   const data = appStore.table
   const newDate = new Date()
   const month = newDate.getMonth() + 1;
   const title = `Daftar_Karyawan_${newDate.getUTCFullYear()}_${month.toString().padStart(2, "0")}`;
   const date = `Jakarta, ${newDate.toLocaleDateString("id-ID", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`;
-  console.log({ data, title, date });
 
 
   const tableHtml = `
@@ -64,8 +59,8 @@ const handlePrint = () => {
         <thead>
           <tr>
             <th>No</th>
-            <th>Nama Karyawan</th>
-            <th>Id Karyawan</th>
+            <th>Nama</th>
+            <th>Id</th>
           </tr>
         </thead>
         <tbody>
