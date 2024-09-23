@@ -3,8 +3,13 @@ import { defineStore } from "pinia";
 
 export const useAppStore = defineStore("app", {
   state: () => ({
-    //
+    table: [],
   }),
+  actions: {
+    setTable(data){
+      this.table = data
+    }
+  }
 });
 
 export const useSessionStore = defineStore("session", {

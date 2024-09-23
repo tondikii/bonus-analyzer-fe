@@ -76,7 +76,7 @@ const handlePrint = async (item) => {
 
     const datePeriod = new Date(item?.period);
     const monthPeriod = datePeriod.getMonth() + 1;
-    const reportTitle = `Performance Report ${datePeriod.getUTCFullYear()}_${monthPeriod.toString().padStart(2, "0")}`;
+    const reportTitle = `Peringkat_Karyawan_${datePeriod.getUTCFullYear()}_${monthPeriod.toString().padStart(2, "0")}`;
     const reportDate = `Jakarta, ${datePeriod.toLocaleDateString("id-ID", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`;
 
     // Convert CSV to HTML table
