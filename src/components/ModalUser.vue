@@ -66,9 +66,9 @@ const submitForm = async () => {
   try {
     if (disabledSubmit.value) return;
     loading.value = true;
-    await api[isEdit ? 'put' : 'post'](`/employee${isEdit ? `/${employee.id}` : ''}`, { name: name.value })
+    await api[isEdit?.value ? 'put' : 'post'](`/employee${isEdit?.value ? `/${employee.id}` : ''}`, { name: name.value })
 
-    SwalToast({ title: `Berhasil ${isEdit ? 'edit' : 'tambah'} karyawan` })
+    SwalToast({ title: `Berhasil ${isEdit?.value ? 'edit' : 'tambah'} karyawan` })
     props.callback()
   } catch (err) {
     const msg = err?.response?.data?.error || `Terjadi error tidak diketahui`
