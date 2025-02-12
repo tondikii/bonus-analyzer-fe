@@ -36,8 +36,10 @@ import { SwalError, SwalSuccess } from '@/lib/sweetalert2';
 import { getDateMinusOneMonth } from '@/utils';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useDate } from 'vuetify';
 
 const router = useRouter()
+const date = useDate()
 
 const loading = ref(false);
 const month = ref(null);
@@ -77,13 +79,17 @@ const disabledSubmit = computed(() => {
   return false;
 });
 
+const formattedPeriod = computed(() => {
+  return new Date(`${month.value?.year}-${month.value?.month + 1}-1`)
+})
+
 
 
 
 const fetchMaster = async (endpoint = '/employee') => {
   try {
     const isFetchEmployee = endpoint === '/employee';
-    const { data } = await api.get(`${endpoint}/only`, { params: {withAppraisal: !isFetchEmployee ? true : undefined} });
+    const { data } = await api.get(`${endpoint}/only`, { params: { withAppraisal: !isFetchEmployee ? true : undefined } });
     if (isFetchEmployee) {
       employees.value = data;
       // Initialize selectedScores based on employees
@@ -123,7 +129,7 @@ const submitForm = async () => {
     loading.value = true;
 
     const performanceData = {
-      period: new Date(`${month.value?.year}-${month.value?.month}-1`),
+      period: formattedPeriod?.value,
       performances: employees.value.map(employee => ({
         employeeId: employee.id,
         scores: criterion.value.map(criteria => ({
@@ -135,7 +141,7 @@ const submitForm = async () => {
 
     await api.post("/performanceReport", performanceData);
 
-    SwalSuccess(`Berhasil buat Laporan Peringkat Karyawan Periode ${month.value}`);
+    SwalSuccess(`Berhasil buat Laporan Peringkat Karyawan Periode ${date.format(formattedPeriod?.value, 'monthAndYear')}`);
     router.replace('/performance');
   } catch (err) {
     const msg = err?.response?.data?.error || "Terjadi error tidak diketahui saat membuat laporan peringkat.";

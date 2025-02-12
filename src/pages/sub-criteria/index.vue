@@ -94,7 +94,6 @@ const handleEdit = (item) => {
   dialog.value = true
 }
 
-
 const handlePrint = () => {
   const data = appStore.table
   const newDate = new Date()
@@ -225,5 +224,12 @@ const handlePrint = () => {
     };
   };
 }
+
+watch(dialog, (newDialog) => {
+  if (!newDialog && selected.value) {
+    selected.value = null
+  }
+}
+);
 
 </script>

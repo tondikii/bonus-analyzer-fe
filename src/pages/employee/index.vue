@@ -1,5 +1,5 @@
 <template>
-  <ModalUser v-model:dialog="dialog" :employee="selectedEmployee" :callback="refreshTable" />
+  <ModalEmployee v-model:dialog="dialog" :employee="selectedEmployee" :callback="refreshTable" />
   <div class="d-flex flex-column w-100 align-center">
     <v-sheet class="d-flex flex-column w-75 mt-16 pa-4" border rounded>
       <v-row align="center" justify="space-between" class="my-1 px-4">
@@ -17,6 +17,7 @@
 </template>
 
 <script setup>
+import ModalEmployee from '@/components/ModalEmployee.vue';
 import { useAppStore, useSessionStore } from '@/stores/app';
 import { ref } from 'vue';
 
@@ -176,5 +177,12 @@ const handlePrint = () => {
     };
   };
 }
+
+watch(dialog, (newDialog) => {
+  if (!newDialog && selectedEmployee.value) {
+    selectedEmployee.value = null
+  }
+}
+);
 
 </script>
