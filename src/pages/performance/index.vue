@@ -67,21 +67,25 @@ const handleDownload = async (item) => {
   }
 }
 
-const handlePrint = async (item) => {
-  try {
-    const { data } = await api.get(`/performanceReport/download/${item?.id}`, {
-      headers: { 'Content-Type': 'text/csv' },
-      responseType: 'text'
-    });
+const handlePrint = (item) => {
 
-    const datePeriod = new Date();
-    const monthPeriod = datePeriod.getMonth() + 1;
-    const reportTitle = `Peringkat_Karyawan_${datePeriod.getUTCFullYear()}_${monthPeriod.toString().padStart(2, "0")}`;
-    const reportDate = `Jakarta, ${datePeriod.toLocaleDateString("id-ID", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`;
+  const datePeriod = new Date();
+  const monthPeriod = datePeriod.getMonth() + 1;
+  const reportTitle = `Peringkat_Karyawan_${datePeriod.getUTCFullYear()}_${monthPeriod.toString().padStart(2, "0")}`;
+  const reportDate = `Jakarta, ${datePeriod.toLocaleDateString("id-ID", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`;
 
-    // Convert CSV to HTML table
-    const rows = data.split('\n').map(row => row.split(','));
-    const tableHtml = `
+
+  // Convert CSV to HTML table
+  const rows = item.Performances.map((performance, idx) => ({
+    no: idx + 1,
+    employeeName: performance.Employee.name,
+    finalScore: performance.finalScore,
+    period: date.format(item?.period, 'monthAndYear'),
+  }));
+
+  console.log("TONDIKI", rows)
+
+  const tableHtml = `
       <table>
         <thead>
           <tr>
@@ -95,18 +99,18 @@ const handlePrint = async (item) => {
           ${rows.slice(1).map((row, index) => `
             <tr>
               <td>${index + 1}</td>
-              <td>${row[1].replace(/['"]/g, '')}</td>
-              <td>${row[2]}</td>
-              <td>${row[3].replace(/['"]/g, '')}</td>
+              <td>${row?.employeeName}</td>
+              <td>${row?.finalScore}</td>
+              <td>${row?.period}</td>
             </tr>
           `).join('')}
         </tbody>
       </table>
     `;
 
-    // Create a new window with the HTML content
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
+  // Create a new window with the HTML content
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(`
       <html>
         <head>
           <title>${reportTitle}</title>
@@ -195,19 +199,15 @@ const handlePrint = async (item) => {
         </body>
       </html>
     `);
-    printWindow.document.close();
+  printWindow.document.close();
 
-    // Wait for content to load before printing
-    printWindow.onload = function () {
-      printWindow.print();
-      printWindow.onafterprint = function () {
-        printWindow.close();
-      };
+  // Wait for content to load before printing
+  printWindow.onload = function () {
+    printWindow.print();
+    printWindow.onafterprint = function () {
+      printWindow.close();
     };
-  } catch (error) {
-    console.error('Error printing report:', error);
-    SwalError("Gagal print laporan peringkat karyawan")
-  }
+  };
 }
 
 
