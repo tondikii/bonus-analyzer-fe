@@ -11,6 +11,8 @@
           <v-text-field label="Nama" v-model="name" required hide-details />
           <v-number-input v-model="weight" control-variant="default" label="Bobot" inset :min="0" :max="100"
             hide-details required />
+          <v-select v-show="withIsBenefit" :items="benefitCostOptions" v-model="isBenefit" item-title="name"
+            item-value="value" @update:modelValue="handleChangeSelect($event)" label="Kategori" required />
 
         </v-card-text>
 
@@ -43,7 +45,7 @@ const props = defineProps({
     default: '/criteria'
   },
   icon: { type: String, default: 'text-box-search-outline' },
-  criteriaId: { type: [Number, undefined], default: undefined }
+  criteriaId: { type: [Number, undefined], default: undefined },
 });
 
 const emit = defineEmits(['update:dialog']);
@@ -51,7 +53,16 @@ const emit = defineEmits(['update:dialog']);
 const dialogRef = ref(props.dialog);
 const name = ref(props.name);
 const weight = ref(props.weight);
+const isBenefit = ref(null);
 const loading = ref(false);
+
+const withIsBenefit = props.title === 'Kriteria'
+
+const benefitCostOptions = [{ name: 'Benefit', value: true }, { name: 'Cost', value: false }]
+
+const handleChangeSelect = (value) => {
+  isBenefit.value = value
+}
 
 const resetForm = () => {
   name.value = '';
@@ -74,6 +85,7 @@ watch(() => props.dialog, (newDialog) => {
 watch(() => props.data, (newData) => {
   name.value = newData?.name || '';
   weight.value = newData?.weight || '';
+  isBenefit.value = newData?.isBenefit || '';
 });
 
 // Emit changes to parent component
@@ -87,13 +99,17 @@ const submitForm = async () => {
   try {
     if (disabledSubmit.value) return;
     loading.value = true;
-    await api[isEdit.value ? 'put' : 'post'](`${props.endpoint}${isEdit.value ? `/${data?.id}` : ''}`, { name: name.value, weight: weight.value, criteriaId: props.criteriaId })
+    const reqPayload = { name: name.value, weight: weight.value, criteriaId: props.criteriaId }
+    if (withIsBenefit) {
+      reqPayload.isBenefit = isBenefit.value
+    }
+    await api[isEdit.value ? 'put' : 'post'](`${props.endpoint}${isEdit.value ? `/${data?.id}` : ''}`, reqPayload)
 
     SwalToast({ title: `Berhasil ${isEdit.value ? 'edit' : 'tambah'} ${props.title.toLowerCase()}` })
     props.callback()
   } catch (err) {
     const msg = err?.response?.data?.error || `Terjadi error tidak diketahui`
-    SwalToast({ title: msg })
+    SwalToast({ title: msg, icon: 'error' })
   } finally {
     loading.value = false;
     dialogRef.value = false;

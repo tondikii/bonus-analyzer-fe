@@ -72,7 +72,7 @@ const submitForm = async () => {
     props.callback()
   } catch (err) {
     const msg = err?.response?.data?.error || `Terjadi error tidak diketahui`
-    SwalToast({ title: msg })
+    SwalToast({ title: msg, icon: 'error' })
   } finally {
     loading.value = false;
     dialogRef.value = false;

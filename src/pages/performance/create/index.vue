@@ -80,7 +80,7 @@ const disabledSubmit = computed(() => {
 });
 
 const formattedPeriod = computed(() => {
-  return new Date(`${month.value?.year}-${month.value?.month + 1}-1`)
+  return new Date(month.value?.year, month.value?.month)
 })
 
 

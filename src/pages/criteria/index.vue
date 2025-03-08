@@ -21,8 +21,9 @@ import { ref } from 'vue';
 import { useAppStore, useSessionStore } from '@/stores/app';
 
 const headers = [
-  { title: 'Nama', align: 'start', sortable: false, key: 'name' },
+  { title: 'Nama', align: 'start', key: 'name', sortable: false },
   { title: 'Bobot', align: 'start', key: 'weight', sortable: false },
+  { title: 'Kategori', align: 'start', key: 'isBenefit', sortable: false },
   { title: 'Jumlah Sub Kriteria', align: 'start', key: 'appraisalsCount', sortable: false },
 ]
 
@@ -48,7 +49,7 @@ const refreshTable = () => {
 }
 
 const dataMapper = (data) => {
-  return data.map(e => ({ ...e, appraisalsCount: e?.Appraisals?.length }))
+  return data.map(e => ({ ...e, appraisalsCount: e?.Appraisals?.length, isBenefit: e?.isBenefit ? 'Benefit' : 'Cost' }))
 }
 
 const handleCreate = () => {
