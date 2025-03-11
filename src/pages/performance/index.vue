@@ -96,7 +96,7 @@ const handlePrint = (item) => {
           </tr>
         </thead>
         <tbody>
-          ${rows.slice(1).map((row, index) => `
+          ${rows.map((row, index) => `
             <tr>
               <td>${index + 1}</td>
               <td>${row?.employeeName}</td>
@@ -115,6 +115,13 @@ const handlePrint = (item) => {
         <head>
           <title>${reportTitle}</title>
           <style>
+            img {
+              width: 3.125rem;
+              height: auto;
+              position: absolute;
+              border-radius: 100%;
+              left: 4rem;
+            }
             body { 
               font-family: Arial, sans-serif; 
               margin: 0;
@@ -182,6 +189,7 @@ const handlePrint = (item) => {
           </style>
         </head>
         <body>
+          <img src="https://ik.imagekit.io/fnzl2pmmqv2d/logo_ayam_YjR8lVGT3.jpeg?updatedAt=1741723220249">
           <h1>Laporan Peringkat Performa Karyawan</h1>
           <h2 class="companyName">Wejaya Food</h2>
 
